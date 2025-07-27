@@ -1,108 +1,117 @@
-# 3D Pipeline Integration Prototype
+# Battleship 3DGS Research Prototype
 
 ## 🎯 Overview
 
-This prototype addresses critical flaws in a proposed 3D graphics pipeline integration plan involving Blender, 3D Gaussian Splatting (3DGS), and Vision Language Models (VLMs). The implementation fixes architectural problems and provides a robust foundation for future development.
+This project reconstructs historical battleships using synthetic multi-view images and 3D Gaussian Splatting (3DGS). Our approach solves the fundamental problem: no multi-view photography exists of these historical vessels that sank decades ago.
 
-## 🚨 Critical Flaws Addressed
+## 🚀 Core Innovation
 
-### 1. **Natural Language Ambiguity Eliminated**
-- **Problem**: Original proposal used `"suggested_action": "Reshape the volume..."` requiring brittle NLP parsing
-- **Solution**: Structured [`tool_calls`](schema/tool_calls_schema.json) with precise 3D coordinates: `"center_xyz": [15.7, -3.2, 8.5]`
+**Problem**: Traditional 3DGS requires 50-200 photos from multiple angles - impossible for ships that no longer exist.
 
-### 2. **Realistic 3DGS Integration Strategy**  
-- **Problem**: Hand-waved mesh-vs-splat conversion challenges
-- **Solution**: Focus on feasible [Path A](implementation-roadmap.md#phase-2-3dgs-integration-path-a---initial-model-generation) (3DGS → mesh conversion) before attempting direct splat editing
+**Solution**: Generate synthetic multi-view datasets using AI image generation with consistency controls, then apply 3DGS reconstruction.
 
-### 3. **Proper Testing Methodology**
-- **Problem**: Relying on 2D VLMs to hallucinate 3D coordinates
-- **Solution**: "Build receiver, simulate sender" - test with [manual JSON data](tests/test_pipeline.py) until true Spatial 3D-LLMs are available
+**Key Insight**: Historical technical drawings provide exact dimensional data that photos cannot. By incorporating these as ControlNet conditioning, we ensure our synthetic images maintain precise proportions and details matching the original naval blueprints.
 
 ## 📁 Project Structure
 
 ```
-├── schema/
-│   └── tool_calls_schema.json     # JSON schema for structured 3D operations
-├── src/
-│   ├── volume_selector.py         # Blender-side geometric selection logic
-│   └── tool_executor.py           # Structured tool call execution engine
-├── tests/
-│   └── test_pipeline.py           # Comprehensive test framework
-├── implementation-roadmap.md      # 5-phase implementation plan
-├── architecture-diagram.md        # Technical architecture visualizations
-└── README.md                      # This file
+├── 01-image-generation/         # Synthetic multi-view image generation
+├── 02-dataset-preparation/      # Format images for 3DGS training
+├── 03-3dgs-training/           # 3D Gaussian Splatting implementation
+├── 04-splat-refinement/        # Clean and optimize splat models
+├── 05-mesh-conversion/         # Convert splats to traditional meshes
+├── 06-final-output/            # Package final deliverables
+├── docs/                       # Architecture and implementation docs
+└── README.md                   # This file
 ```
 
-## 🧪 Test Results
+## ⚙️ Technical Stack
 
-```bash
-python tests/test_pipeline.py
-```
+### Hardware Requirements
+- **Local Development**: RTX 3090 (24GB) + RTX 5090 (32GB)
+- **OS**: Windows 11
+- **RAM**: 64GB+ recommended
+- **Storage**: 2TB+ for datasets and checkpoints
 
-- ✅ **100% Test Pass Rate** (5/5 tests passed)
-- ✅ **Schema Validation Working** (properly caught invalid test case)
-- ✅ **Structured Operations Functional** (no NLP parsing required)
-- ✅ **Mathematical Precision** (exact 3D coordinates vs. vague descriptions)
+### Software Dependencies
+- **Image Generation**: ComfyUI, Stable Diffusion XL, ControlNet
+- **3DGS Framework**: Gaussian Splatting (Inria implementation)
+- **Pose Estimation**: COLMAP
+- **Development**: Python 3.10+, CUDA 11.8+
 
-## 📋 Implementation Phases
+## 🔬 Pipeline Stages
 
-### ✅ **Phase 1: Architecture Foundation** (COMPLETED)
-- [x] JSON schema with structured 3D volume definitions
-- [x] Blender-side volume selection logic
-- [x] Test framework for manual JSON validation
-- [x] Robust input validation system
+### Stage 1: Image Generation
+- Generate 200-500 consistent multi-view images using dual ControlNet conditioning
+- Layer 1: Depth maps from 3D proxy models
+- Layer 2: Line art from historical technical drawings
+- Ensures both geometric consistency and dimensional accuracy
 
-### 🔄 **Phase 2: 3DGS Integration** (Path A - Next Priority)
-- [ ] Research 3DGS-to-mesh conversion techniques
-- [ ] Implement photo-to-3DGS model generation
-- [ ] Develop mesh conversion pipeline
-- [ ] Test integration with existing mesh workflow
+### Stage 2: Dataset Preparation
+- Estimate camera poses and validate image consistency
+- Create training manifests with 360° coverage verification
 
-### 🚀 **Phase 3-5: Advanced Features** (Future)
-- Enhanced tool call system with complex 3D operations
-- API interface for future Spatial 3D-LLMs
-- Long-term research into direct splat editing
+### Stage 3: 3DGS Training
+- Train high-quality Gaussian splat models (3-8M splats)
+- Target metrics: PSNR >28dB, SSIM >0.90
+- Training time: 6-12 hours on local GPUs
+
+### Stage 4: Splat Refinement
+- Remove floating artifacts and optimize density
+- Color correction and opacity threshold adjustment
+
+### Stage 5: Mesh Conversion
+- Convert splats to watertight meshes using Poisson reconstruction
+- UV unwrapping and texture baking from splats
+
+### Stage 6: Final Output
+- Package deliverables including 3D models, turntables, and documentation
+
+## 📊 Quality Metrics
+
+### Synthetic Image Quality
+- **Consistency**: <5% scale variation across views
+- **Coverage**: No gaps >10° in viewing angles
+- **Realism**: Pass manual inspection for historical accuracy
+
+### 3DGS Reconstruction Quality
+- **Quantitative**: PSNR >28dB, SSIM >0.90, LPIPS <0.1
+- **Visual**: No major artifacts, clear detail preservation
+- **Geometric**: Accurate proportions vs. technical drawings
+
+### Final Mesh Quality
+- **Topology**: <500k triangles, mostly quads
+- **Watertight**: No holes or non-manifold edges
+- **Texture**: 4K resolution, minimal seams
+
+## 🎯 Success Criteria
+
+### Minimum Viable Success
+- [ ] One complete Bismarck model
+- [ ] Visual quality suitable for research publication
+- [ ] Basic documentation of methodology
+
+### Target Success
+- [ ] Bismarck + USS Iowa models
+- [ ] Quantitative comparison with baselines
+- [ ] Reproducible pipeline with scripts
+
+### Stretch Goals
+- [ ] All three ships (+ Yamato)
+- [ ] Real-time viewer application
+- [ ] Published paper/blog post
+
+## 🚀 Future Extensions
+
+1. **VLM Integration**: Use archived VLM-editing workflow for intelligent model refinement
+2. **Multi-ship Training**: Train on multiple ships simultaneously for better generalization
+3. **Interactive Viewer**: WebGL-based 3DGS viewer for results
+4. **Automated Pipeline**: End-to-end script from references to final model
 
 ## 🔧 Quick Start
 
-1. **Install Dependencies**:
-   ```bash
-   pip install jsonschema
-   ```
-
-2. **Run Tests**:
-   ```bash
-   python tests/test_pipeline.py
-   ```
-
-3. **Explore Schema**:
-   - Check [`schema/tool_calls_schema.json`](schema/tool_calls_schema.json) for valid JSON structure
-   - See [`tests/test_pipeline.py`](tests/test_pipeline.py) for usage examples
-
-## 📊 Key Architectural Improvements
-
-| Aspect | ❌ Original (Flawed) | ✅ Corrected |
-|--------|---------------------|--------------|
-| **Commands** | `"suggested_action": "Reshape..."` | `"function_name": "extrude_faces_in_volume"` |
-| **Coordinates** | `"upper-left"` (vague) | `"center_xyz": [15.7, -3.2, 8.5]` (precise) |
-| **Parsing** | Complex NLP required | Direct JSON schema validation |
-| **Validation** | Prone to interpretation errors | Mathematical bounds checking |
-| **Testing** | Relies on hallucinated VLM output | Manual data with known results |
-
-## 🎯 Next Steps
-
-1. **Begin Phase 2**: Start 3DGS-to-mesh conversion research
-2. **Extend Tool Library**: Add more geometric operations to [`src/tool_executor.py`](src/tool_executor.py)
-3. **Blender Integration**: Test [`src/volume_selector.py`](src/volume_selector.py) in actual Blender environment
-4. **Performance Optimization**: Implement spatial indexing for large meshes
-
-## 🏆 Success Metrics
-
-- **Architectural Robustness**: Zero natural language parsing dependencies
-- **Precision**: Mathematically exact 3D operations
-- **Extensibility**: Clean JSON schema supports future VLM capabilities
-- **Reliability**: 100% test coverage with comprehensive validation
+See detailed implementation plans in [`docs/01MasterArchitecture.md`](docs/01MasterArchitecture.md)
 
 ---
 
-*This prototype demonstrates that structured, geometrically-precise tool calls provide a robust foundation for 3D pipeline integration without the brittleness of natural language processing.*
+*This architecture provides a clear path from historical references to high-quality 3D models using synthetic multi-view generation and 3DGS.*

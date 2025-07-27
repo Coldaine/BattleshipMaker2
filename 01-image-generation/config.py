@@ -34,7 +34,7 @@ class AppConfig:
 
     def get_api_key(self):
         """Get API key from environment, falling back to a placeholder."""
-        return os.getenv("GOOGLE_API_KEY", "your_api_key_here")
+        return os.getenv("GOOGLE_API_KEY", "AIzaSyBbz8RJloQMJydYVfkdAJaL6ysq_bUkSe4")
 
 # Global config instance
 config = AppConfig()

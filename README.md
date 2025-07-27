@@ -6,9 +6,9 @@ This project reconstructs historical battleships using synthetic multi-view imag
 
 ## 🚀 Core Innovation
 
-**Problem**: Traditional 3DGS requires 50-200 photos from multiple angles - impossible for ships that no longer exist.
+**Problem**: Traditional 3DGS requires 50-200 photos from multiple angles—impossible for ships that no longer exist.
 
-**Solution**: Generate synthetic multi-view datasets using AI image generation with consistency controls, then apply 3DGS reconstruction.
+**Solution**: A dual-path strategy for synthetic data generation. We primarily use Google's Gemini API for its state-of-the-art prompt understanding, with a fallback to a local Stable Diffusion + ControlNet pipeline for maximum geometric control.
 
 **Key Insight**: Historical technical drawings provide exact dimensional data that photos cannot. By incorporating these as ControlNet conditioning, we ensure our synthetic images maintain precise proportions and details matching the original naval blueprints.
 
@@ -34,7 +34,8 @@ This project reconstructs historical battleships using synthetic multi-view imag
 - **Storage**: 2TB+ for datasets and checkpoints
 
 ### Software Dependencies
-- **Image Generation**: ComfyUI, Stable Diffusion XL, ControlNet
+- **Image Generation**: Google Gemini API (Primary), ComfyUI / Stable Diffusion XL (Fallback)
+- **ControlNet**: Required for the fallback local pipeline
 - **3DGS Framework**: Gaussian Splatting (Inria implementation)
 - **Pose Estimation**: COLMAP
 - **Development**: Python 3.10+, CUDA 11.8+
@@ -42,10 +43,9 @@ This project reconstructs historical battleships using synthetic multi-view imag
 ## 🔬 Pipeline Stages
 
 ### Stage 1: Image Generation
-- Generate 200-500 consistent multi-view images using dual ControlNet conditioning
-- Layer 1: Depth maps from 3D proxy models
-- Layer 2: Line art from historical technical drawings
-- Ensures both geometric consistency and dimensional accuracy
+- **Path A (Primary)**: Generate views using the Google Gemini API with detailed, structured prompts for camera control.
+- **Path B (Fallback)**: Generate views using a local pipeline with multi-layer ControlNet (depth maps + technical line art) for strong geometric consistency.
+- Both paths aim for 200-500 consistent images.
 
 ### Stage 2: Dataset Preparation
 - Estimate camera poses and validate image consistency

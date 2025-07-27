@@ -2,13 +2,13 @@
 
 ## Executive Summary
 
-This document outlines the master architecture for reconstructing historical battleships using synthetic multi-view images and 3D Gaussian Splatting (3DGS). Our approach solves the fundamental problem: no multi-view photography exists of these historical vessels.
+This document outlines the master architecture for reconstructing historical battleships using 3D Gaussian Splatting (3DGS). Our approach solves the fundamental problem of non-existent multi-view photography by pursuing a **dual-path synthetic image generation strategy**. The primary path leverages advanced cloud-based AI (Google Gemini) for maximum quality, while the secondary path uses a local, controllable pipeline as a robust fallback.
 
 ## Core Innovation
 
 **Problem**: Traditional 3DGS requires 50-200 photos from multiple angles - impossible for ships that no longer exist.
 
-**Solution**: Generate synthetic multi-view datasets using AI image generation with consistency controls, then apply 3DGS reconstruction.
+**Solution**: Generate synthetic multi-view datasets using a dual-path AI generation strategy. **Path A (Primary)** uses Google's Gemini model for its state-of-the-art prompt understanding. **Path B (Fallback)** uses a local Stable Diffusion pipeline with strong geometric controls.
 
 **Key Insight**: Historical technical drawings provide exact dimensional data that photos cannot. By incorporating these as ControlNet conditioning, we ensure our synthetic images maintain precise proportions and details matching the original naval blueprints.
 
@@ -25,10 +25,12 @@ graph TB
     end
     
     subgraph "Synthetic Generation Pipeline"
-        C --> D[Multi-Model Testing]
-        B --> CN[ControlNet Conditioning]
-        CN --> D
-        D --> E[Consistency Validation]
+        C --> D1["Path A (Primary):<br/>Cloud AI Generation<br/>(Google Gemini API)"]
+        C --> D2["Path B (Fallback):<br/>Local Generation<br/>(SDXL + ControlNet)"]
+        B --> D2
+        
+        D1 --> E[Consistency Validation]
+        D2 --> E
         E --> F[200-500 Synthetic Views]
     end
     
@@ -55,7 +57,8 @@ graph TB
 
 ### Software Dependencies
 - **Image Generation**: ComfyUI, Stable Diffusion XL, ControlNet (Multi-layer)
-- **Technical Drawing Processing**: OpenCV, Canny edge detection, PIL
+- **Cloud AI**: Google Gemini API
+- **Technical Drawing Processing**: OpenCV, PIL
 - **3DGS Framework**: Gaussian Splatting (Inria implementation)
 - **Pose Estimation**: COLMAP
 - **Mesh Processing**: Open3D, Meshlab
@@ -154,11 +157,11 @@ graph TB
 ## Implementation Timeline
 
 ### Week 1: Image Generation Pipeline
-- Day 1-2: Set up ComfyUI + Multi-layer ControlNet
-- Day 3: Collect and process Bismarck technical drawings
-- Day 4: Create Bismarck 3D proxy for depth maps
-- Day 5: Integrate technical drawings into ControlNet workflow
-- Day 6-7: Generate and validate first 200-view dataset
+- Day 1: Set up Google Gemini API access and test basic prompts.
+- Day 2-3: Develop and refine structured prompts for multi-view generation. Generate first test batch.
+- Day 4: Implement automated consistency validation and filtering for Gemini outputs.
+- Day 5: Generate full 500+ view dataset with Gemini.
+- Day 6-7: (Parallel/Fallback) Set up and test the local ControlNet pipeline as a baseline.
 
 ### Week 2: 3DGS Training
 - Day 1-2: Set up 3DGS environment
@@ -190,7 +193,9 @@ graph TB
 ## Risk Mitigation
 
 ### Risk 1: Inconsistent Synthetic Images
-**Mitigation**: Use depth-controlled generation, oversample and select best views
+**Mitigation**:
+- **Path A (Gemini)**: Oversample views by 3-5x and use automated CLIP/LPIPS scoring to select the most consistent subset.
+- **Path B (Local)**: Rely on strong ControlNet (depth, line art) conditioning for geometric stability.
 
 ### Risk 2: Poor 3DGS Convergence
 **Mitigation**: Multiple training runs, hyperparameter grid search

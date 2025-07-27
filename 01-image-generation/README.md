@@ -1,75 +1,55 @@
-# Image Generation Prompt Engine
+# Simulated Image Generation Pipeline
 
-This tool generates a systematic set of prompts and metadata for creating a consistent image dataset of the Bismarck battleship. The output is designed to be used with a text-to-image generation model to create images suitable for 3D Gaussian Splatting (3DGS) training.
+This project provides a simulated pipeline for generating a systematic image dataset of the Bismarck battleship, intended for 3D Gaussian Splatting (3DGS) training. It generates placeholder images and corresponding metadata based on a structured set of camera poses and prompts.
 
-**Note:** This script *does not* generate images directly. It creates the structured prompts and camera pose metadata required for a separate image generation process.
+**Note:** This is a *simulation*. It creates placeholder images with metadata to mimic a real image generation pipeline but does not make actual API calls to an image generation service.
 
 ## Features
 
--   **Systematic Prompt Generation**: Creates detailed prompts for consistent ship appearance across all images.
--   **Configurable Camera Poses**: Generates prompts for a 360° view of the subject with configurable distances, heights, and angles.
--   **Metadata Tracking**: Saves a JSON file for each generated prompt, containing the exact parameters used.
--   **Batch Processing**: CLI support for generating a specified number of prompts in a named batch.
--   **Dataset Validation**: A simple validation tool to check the diversity and coverage of camera poses in a generated batch.
+-   **Configuration-Driven**: All parameters are managed in `config.yaml` for easy modification.
+-   **Systematic Prompt Generation**: Creates detailed prompts for consistent image characteristics.
+-   **Structured Metadata**: Saves a JSON file for each image with detailed generation parameters.
+-   **Simulated Image Output**: Generates placeholder PNG images with metadata text for each prompt.
+-   **CLI Interface**: A simple command-line interface to run batch generation.
 
 ## How It Works
 
-The pipeline operates in two main stages:
-
-1.  **Prompt Generation**: The `main.py` script is executed, which uses the `BismarckImageGenerator` class to generate a batch of text prompts and corresponding metadata files. These are saved in the `generated_images/` directory under a specified batch name.
-2.  **Image Generation (Manual Step)**: The generated prompts must then be used with a separate text-to-image model (e.g., Midjourney, Stable Diffusion, or a future Gemini model with image generation capabilities) to produce the actual images.
+The pipeline reads camera poses and prompt details from `config.yaml`. When you run a batch, it iterates through the specified number of camera pose combinations, generates a text prompt, and creates a corresponding placeholder image and a JSON metadata file.
 
 ## Setup and Installation
 
-1.  **Install Dependencies**:
+1.  **Clone the Repository** (if you haven't already).
+
+2.  **Install Dependencies**:
     ```bash
     pip install -r requirements.txt
     ```
-    *Note: A `setup.py` script is included for convenience, which runs this command.*
 
-2.  **Configure API Keys**:
-    This project is configured to use Google Gemini for future integration, but no API key is required for the current prompt-generation functionality. A `.env.template` is provided for forward-compatibility.
+3.  **Review Configuration**:
+    Open `config.yaml` to review and adjust parameters like image dimensions, camera poses, and prompt styles.
 
 ## Usage
 
-### Generating a Batch of Prompts
-
-To generate a new set of prompts, run `main.py` with the desired batch name and number of images.
+To generate a new batch of simulated images, run `main.py` with a batch name and the number of images to generate.
 
 ```bash
-python main.py --batch-name <your_batch_name> --num-images <number_of_prompts>
+python main.py --batch-name <your_batch_name> --num-images <number_of_images>
 ```
 
 **Example:**
 
 ```bash
-# Generate 50 prompts for a batch named "production_run_01"
-python main.py --batch-name production_run_01 --num-images 50
+# Generate 20 placeholder images for a batch named "initial_test_run"
+python main.py --batch-name initial_test_run --num-images 20
 ```
 
-The output will be saved in `generated_images/production_run_01/`.
+The output will be saved in `generated_images/initial_test_run/`, containing `.png` and `.json` files for each generated item.
 
-### Validating a Dataset
+## Project Structure
 
-The validation tool checks if a generated batch has sufficient variety in its camera poses for 3DGS training.
-
-```bash
-python main.py --validate-only --output-dir <path_to_batch>
-```
-
-**Example:**
-
-```bash
-# Validate the batch generated in the previous step
-python main.py --validate-only --output-dir generated_images/production_run_01
-```
-
-## Configuration
-
-The core parameters for prompt generation can be modified in `config.py`:
-
--   `camera_distances`: A list of camera distances from the ship (in meters).
--   `camera_heights`: A list of camera heights above the water (in meters).
--   `camera_angles`: A list of camera angles around the ship (in degrees).
--   `style_prompt`: The base art style description.
--   `negative_prompt`: Terms to exclude from the generation.
+-   `main.py`: The command-line entry point for the application.
+-   `image_generator.py`: Contains the core `ImageGenerator` class that handles the generation logic.
+-   `config.py`: Loads and provides access to the configuration from `config.yaml`.
+-   `config.yaml`: The main configuration file for all parameters.
+-   `requirements.txt`: A list of all Python dependencies.
+-   `generated_images/`: The default output directory for all generated content.

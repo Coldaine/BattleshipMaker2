@@ -2,11 +2,11 @@
 
 > **Note: This project is archived and not in active development.** The concepts and code within are from an exploratory phase and are not currently maintained.
 
-This folder contains the original vision for a VLM-driven 3D editing pipeline where:
-
 1. A Vision Language Model (VLM) analyzes 3D scenes
 2. Outputs structured JSON commands with precise 3D coordinates
 3. Commands execute in Blender to modify geometry
+
+## System Architecture
 
 ## Key Components
 
@@ -14,21 +14,21 @@ This folder contains the original vision for a VLM-driven 3D editing pipeline wh
 - **schema/**: JSON schema for structured tool calls
 - **tests/**: Test pipeline for validating commands
 - **docs/**: Original architecture and implementation plans
-
+*   **`src/procedural/`**: Modules for procedural scene generation based on high-level VLM commands.
 ## Archived Status & Rationale
-
+*   **`src/plugins/`**: A plugin system allowing for custom workflow extensions, new tools, and VLM integrations.
 This workflow is currently **archived** as we focus on the more immediate goal of synthetic image → 3DGS reconstruction for battleships. The VLM editing approach remains a potential future enhancement once we have:
-
+*   **`src/vcs/`**: Version control integration for tracking changes to Blender scene files.
 1. Proven the 3DGS reconstruction pipeline
 2. Developed a library of high-quality 3D models
 3. Access to spatial-aware VLMs that can output precise 3D coordinates
-
+## Project Status & Integration
 The core innovation of volume-based selection (selecting geometry within 3D boxes/spheres) could still be valuable for the splat refinement phase of our current pipeline.
-
+This workflow is under active development as a parallel track to the main 3DGS reconstruction pipeline. The goal is to create a robust programmatic editing tool that can be used for multiple purposes:
 ## Future Vision & Potential Features
-
+1.  **Dataset Augmentation**: Programmatically creating variations of 3D scenes to generate richer synthetic image datasets.
 Should this project be revived, a production-ready implementation would need to address several key areas. The following is a conceptual roadmap of features that would be required to build a robust system:
-
+3.  **Creative Tooling**: Serving as a foundation for natural language-driven 3D content creation.
 -   **Comprehensive Blender API:** A deeper and more abstract API layer for complex scene manipulations, including material/shader editing, lighting adjustments (adding/removing lights, changing properties), and camera controls.
 -   **Procedural Generation:** Support for procedural scene generation based on high-level VLM commands (e.g., "create a forest scene," "build a modern cityscape").
 -   **Robust Workflow Automation:**
@@ -42,3 +42,4 @@ Should this project be revived, a production-ready implementation would need to 
 -   **Advanced Capabilities:**
     -   **Real-time Preview:** A mechanism for efficient data streaming between the VLM and Blender to enable near real-time visualization of proposed changes.
     -   **Version Control:** Integration with systems like Git LFS for versioning Blender scene files (`.blend`) and tracking changes programmatically.
+*   **CLI & Configuration**: A command-line interface driven by a `config.yaml` file for easy configuration and execution.

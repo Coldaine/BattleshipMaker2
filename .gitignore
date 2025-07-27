@@ -44,8 +44,7 @@ coverage.xml
 *.tar.gz
 *.7z
 
-# Images and media
-01-image-generation/reference-images/
+# Large generated images and outputs
 01-image-generation/synthetic-outputs/
 02-dataset-preparation/datasets/
 03-3dgs-training/checkpoints/
@@ -54,6 +53,13 @@ coverage.xml
 05-mesh-conversion/converted-meshes/
 06-final-output/exports/
 06-final-output/renders/
+
+# Large images (keep small reference images)
+*_4k.*
+*_8k.*
+*_large.*
+*_generated.*
+*_synthetic.*
 
 # Temporary files
 *.tmp
@@ -64,9 +70,12 @@ tmp/
 # ComfyUI specific
 ComfyUI/
 *.png
-*.jpg
-*.jpeg
 *.exr
+
+# Allow reference images but exclude large generated ones
+!01-image-generation/reference-images/**/*.jpg
+!01-image-generation/reference-images/**/*.jpeg
+!01-image-generation/reference-images/**/*.png
 
 # 3D files (except examples)
 *.obj
